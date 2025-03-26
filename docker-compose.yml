@@ -1,0 +1,42 @@
+services:
+  frontend:
+    build:
+      context: ./frontend/.
+      dockerfile: ../docker/Dockerfile_frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/usr/src/app:cached
+    command: /usr/src/app/entrypoint.sh
+  backend:
+    build:
+      context: ./backend/.
+      dockerfile: ../docker/Dockerfile_backend
+    depends_on:
+      - postgres
+    env_file:
+      - ./env/backend.development.env
+    ports:
+      - 3002:3002
+    volumes:
+      - ./backend:/usr/src/app:cached
+    command: /usr/src/app/entrypoint.sh
+  postgres:
+    image: postgres:16
+    restart: on-failure
+    environment:
+      POSTGRES_DB: deeporigin
+      POSTGRES_USER: deeporigin
+      POSTGRES_PASSWORD: deeporigin
+    ports:
+      - 9432:5432
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+  redis:
+    image: redis:6.2-alpine
+    restart: on-failure
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - ./data/redis:/data

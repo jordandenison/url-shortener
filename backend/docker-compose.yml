@@ -1,0 +1,35 @@
+services:
+  frontend:
+    build:
+      context: ./frontend/.
+      dockerfile: ../docker/Dockerfile_frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/usr/src/app:cached
+    command: /usr/src/app/entrypoint.sh
+  backend:
+    build:
+      context: ./backend/.
+      dockerfile: ../docker/Dockerfile_backend
+    depends_on:
+      - postgres
+    env_file:
+      - ./env/backend.development.env
+    environment:
+      - INIT_PAYPAL=true
+    ports:
+      - 302:3002
+    volumes:
+      - ./backend:/usr/src/app:cached
+    command: /usr/src/app/entrypoint.sh
+  postgres-test:
+    image: postgres:16
+    restart: on-failure
+    environment:
+      POSTGRES_DB: deeporigin
+      POSTGRES_USER: deeporigin
+      POSTGRES_PASSWORD: deeporigin
+  redis:
+    image: redis:6.2-alpine
+    command: redis-server --save 20 1 --loglevel warning

@@ -1,0 +1,73 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {},
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "extends": [
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "plugins": [
+    "import",
+    "react-hooks",
+    "@typescript-eslint",
+    "unused-imports",
+    "prettier"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": [
+      "error",
+      {
+        "ignoreRestArgs": true
+      }
+    ],
+    "@typescript-eslint/consistent-type-assertions": "error",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "no-unreachable": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "import/no-cycle": "error",
+    "import/no-self-import": "error",
+    "import/no-duplicates": "error",
+    "import/order": "error",
+    "import/no-unused-modules": [
+      "error",
+      {
+        "unusedExports": true,
+        "missingExports": true,
+        "ignoreExports": [
+          "src/index.tsx",
+          "src/setupTests.ts",
+          "src/react-app-env.d.ts"
+        ]
+      }
+    ],
+    "unused-imports/no-unused-imports": "error",
+    "no-alert": "error",
+    "@typescript-eslint/member-ordering": [
+      "error",
+      {
+        "default": [
+          "signature",
+          "static-field",
+          "static-method",
+          "private-field",
+          "field",
+          "constructor",
+          "method",
+          "private-method"
+        ]
+      }
+    ]
+  }
+}
