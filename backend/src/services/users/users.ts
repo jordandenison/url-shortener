@@ -3,11 +3,26 @@ import { authenticate } from '@feathersjs/authentication'
 
 import { hooks as schemaHooks } from '@feathersjs/schema'
 
-import { userDataValidator, userPatchValidator, userQueryValidator, userQueryResolver } from './users.schema'
+import {
+  userDataResolver,
+  userDataValidator,
+  userPatchResolver,
+  userPatchValidator,
+  userQueryValidator,
+  userQueryResolver,
+  propertiesToStripExternally
+} from './users.schema'
 
 import type { Application } from '../../declarations'
+
+import { disableExternal } from '../../hooks/disable-external'
+import { setCreatedAt } from '../../hooks/set-created-at'
+import { setUpdatedAt } from '../../hooks/set-updated-at'
+import { stripResultProperties } from '../../hooks/strip-result-properties'
+
 import { UserService, getOptions } from './users.class'
 import { userPath, userMethods } from './users.shared'
+import { findPackageJSON } from 'module'
 
 export * from './users.class'
 export * from './users.schema'
@@ -19,21 +34,16 @@ export const user = (app: Application) => {
   })
   app.service(userPath).hooks({
     around: {
-      all: [authenticate('jwt')]
+      all: [stripResultProperties(propertiesToStripExternally)],
+      find: [authenticate('jwt')],
+      get: [authenticate('jwt')],
+      patch: [authenticate('jwt')]
     },
     before: {
       all: [schemaHooks.validateQuery(userQueryValidator), schemaHooks.resolveQuery(userQueryResolver)],
-      find: [],
-      get: [],
-      create: [schemaHooks.validateData(userDataValidator)],
-      patch: [schemaHooks.validateData(userPatchValidator)],
-      remove: []
-    },
-    after: {
-      all: []
-    },
-    error: {
-      all: []
+      create: [schemaHooks.validateData(userDataValidator), schemaHooks.resolveData(userDataResolver), setCreatedAt, setUpdatedAt],
+      patch: [schemaHooks.validateData(userPatchValidator), schemaHooks.resolveData(userPatchResolver), setUpdatedAt],
+      remove: [disableExternal]
     }
   })
 }

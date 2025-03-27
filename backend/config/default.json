@@ -1,9 +1,9 @@
 {
   "host": "localhost",
-  "port": 3030,
+  "port": 3002,
   "public": "./public/",
   "origins": [
-    "http://localhost:3030"
+    "http://localhost:3002"
   ],
   "paginate": {
     "default": 10,
@@ -12,5 +12,26 @@
   "postgresql": {
     "client": "pg",
     "connection": "postgres://deeporigin:deeporigin@postgres:5432/deeporigin"
+  },
+  "authentication": {
+    "entity": "user",
+    "service": "users",
+    "secret": "fhcN+uWhTRm1ejBT/gadpr1ztukV7u0K",
+    "authStrategies": [
+      "jwt",
+      "local"
+    ],
+    "jwtOptions": {
+      "header": {
+        "typ": "access"
+      },
+      "audience": "https://yourdomain.com",
+      "algorithm": "HS256",
+      "expiresIn": "1d"
+    },
+    "local": {
+      "usernameField": "username",
+      "passwordField": "password"
+    }
   }
 }
