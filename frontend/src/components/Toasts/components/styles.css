@@ -1,0 +1,10 @@
+.rtninja-toast-container {
+  cursor: pointer;
+  margin-bottom: 20px;
+  width: 400px;
+}
+
+.rtninja-toast-container:hover {
+  border: 1px solid white;
+  box-shadow: -3px 3px 5px white;
+}

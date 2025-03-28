@@ -29,11 +29,12 @@
     "test": "test"
   },
   "files": [
-    "lib/client.js",
+    "lib/**/*.js",
     "lib/**/*.d.ts",
     "lib/**/*.shared.js"
   ],
-  "main": "lib/client",
+  "main": "lib/src/client",
+  "types": "lib/src/client.d.ts",
   "scripts": {
     "dev": "npm run migrate && nodemon -x ts-node src/index.ts",
     "compile": "shx rm -rf lib/ && tsc",
