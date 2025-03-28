@@ -98,7 +98,7 @@ describe('urls service', () => {
     assert.strictEqual(queryUrls.length, 0)
   })
 
-  it('allows a user to create a url with the same value as another user', async () => {
+  it('allows a user to create a URL with the same value as another user', async () => {
     const [client1] = await createAndAuthTestUserAndClient(appUrl)
     const [client2] = await createAndAuthTestUserAndClient(appUrl)
     const value = 'https://example.com/unique-page'
@@ -224,6 +224,28 @@ describe('urls service', () => {
 
     try {
       await client1.service('urls').patch(createdUrl1.id, { slug: createdUrl2.slug })
+      assert.fail('Should have thrown an error')
+    } catch (error: any) {
+      assert(error instanceof Error)
+      assert.ok(error.message.includes('duplicate key value violates unique constraint'))
+    }
+  })
+
+  it('does not allow a user to update to an existing value', async () => {
+    const [client1] = await createAndAuthTestUserAndClient(appUrl)
+
+    const urlData1: UrlData = {
+      value: 'https://example.com/page17'
+    }
+    const createdUrl1 = await client1.service('urls').create(urlData1)
+    const urlData2: UrlData = {
+      value: 'https://example.com/page18'
+    }
+    const createdUrl2 = await client1.service('urls').create(urlData2)
+    createdUrls.push(createdUrl1, createdUrl2)
+
+    try {
+      await client1.service('urls').patch(createdUrl2.id, { value: urlData1.value })
       assert.fail('Should have thrown an error')
     } catch (error: any) {
       assert(error instanceof Error)
