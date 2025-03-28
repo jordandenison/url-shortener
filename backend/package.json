@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "backend",
   "description": "",
   "version": "0.0.0",
   "homepage": "",
@@ -37,6 +37,7 @@
   "scripts": {
     "dev": "nodemon -x ts-node src/index.ts",
     "compile": "shx rm -rf lib/ && tsc",
+    "coverage": "cross-env NODE_ENV=test nyc mocha test/ --require ts-node/register --recursive --extension .ts --exit",
     "start": "node lib/",
     "prettier": "npx prettier \"**/*.ts\" --write",
     "mocha": "cross-env NODE_ENV=test mocha test/ --require ts-node/register --recursive --extension .ts --exit",
@@ -68,12 +69,14 @@
   "devDependencies": {
     "@feathersjs/cli": "^5.0.33",
     "@feathersjs/rest-client": "^5.0.33",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.13",
     "axios": "^1.8.4",
     "cross-env": "^7.0.3",
     "mocha": "^11.1.0",
     "nodemon": "^3.1.9",
+    "nyc": "^17.1.0",
     "prettier": "^3.5.3",
     "shx": "^0.3.4",
     "ts-node": "^10.9.2",

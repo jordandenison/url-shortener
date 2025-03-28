@@ -22,7 +22,6 @@ import { stripResultProperties } from '../../hooks/strip-result-properties'
 
 import { UserService, getOptions } from './users.class'
 import { userPath, userMethods } from './users.shared'
-import { findPackageJSON } from 'module'
 
 export * from './users.class'
 export * from './users.schema'

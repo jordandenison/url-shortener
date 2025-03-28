@@ -6,6 +6,7 @@ import { dataValidator } from './validators'
 export const configurationSchema = Type.Intersect([
   defaultAppConfiguration,
   Type.Object({
+    currentSlug: Type.String(),
     host: Type.String(),
     port: Type.Number(),
     public: Type.String()

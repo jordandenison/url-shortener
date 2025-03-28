@@ -33,5 +33,6 @@
       "usernameField": "username",
       "passwordField": "password"
     }
-  }
+  },
+  "currentSlug": "aaaaa"
 }

@@ -33,12 +33,10 @@ export const userDataResolver = resolve<User, HookContext<UserService>>({
   password: passwordHash({ strategy: 'local' })
 })
 
-export const userPatchSchema = Type.Partial(
-  Type.Pick(userSchema, ['password'], {
-    $id: 'UserPatch',
-    additionalProperties: false
-  })
-)
+export const userPatchSchema = Type.Pick(userSchema, ['password'], {
+  $id: 'UserPatch',
+  additionalProperties: false
+})
 export type UserPatch = Static<typeof userPatchSchema>
 export const userPatchValidator = getValidator(userPatchSchema, dataValidator)
 export const userPatchResolver = resolve<User, HookContext<UserService>>({
@@ -54,12 +52,6 @@ export const userQueryValidator = getValidator(userQuerySchema, queryValidator)
 export const userQueryResolver = resolve<UserQuery, HookContext<UserService>>({
   id: async (value, user, context) => {
     if (context.params.user) {
-      if (context.params.query) {
-        context.params.query.id = context.params.user.id
-      } else {
-        context.params.query = { id: context.params.user.id }
-      }
-
       return context.params.user.id
     }
 

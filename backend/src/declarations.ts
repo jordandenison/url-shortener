@@ -4,8 +4,6 @@ import { ApplicationConfiguration } from './configuration'
 
 import type { User } from './services/users/users'
 
-import { Users } from './services/authentication/authentication'
-
 export type { NextFunction }
 
 export interface Configuration extends ApplicationConfiguration {}

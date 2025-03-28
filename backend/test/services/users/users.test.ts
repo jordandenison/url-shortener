@@ -14,7 +14,7 @@ const createdUsers: User[] = []
 const port = 3003
 const appUrl = `http://${app.get('host')}:${port}`
 
-describe.only('users service', () => {
+describe('users service', () => {
   before(async () => {
     await app.listen(port)
   })
@@ -152,7 +152,7 @@ describe.only('users service', () => {
     createdUsers.push(user)
 
     try {
-      await client.service('users').patch(user.id, { username: 'newusername' } as UserPatch)
+      await client.service('users').patch(user.id, { username: 'newusername' } as any) // eslint-disable-line
       assert.fail('Should have thrown an error')
     } catch (error: any) {
       assert(error instanceof BadRequest)
