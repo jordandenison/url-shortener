@@ -12,6 +12,8 @@ export const selectToasts = (state: RootState) => state.toasts.data
 
 // urls
 export const selectUrlsData = (state: RootState) => state.urls.data
+export const selectUrlData = (id: number, state: RootState) => state.urls.data.find((url) => url.id === id)
+export const selectUrlDataBySlug = (slug: string, state: RootState) => state.urls.data.find((url) => url.slug === slug)
 export const selectUrlsErrorMessage = (state: RootState) => state.urls.errorMessage
 export const selectUrlsLimit = (state: RootState) => state.urls.limit
 export const selectUrlsSkip = (state: RootState) => state.urls.skip

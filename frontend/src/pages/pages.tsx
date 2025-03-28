@@ -7,16 +7,28 @@ export interface Page {
 
 const pages: Page[] = [
   {
-    name: 'Home',
-    elementName: 'Home',
+    name: 'Dashboard',
+    elementName: 'Dashboard',
     path: '/',
     pathRegExp: /\/$/
   },
   {
-    name: 'Dashboard',
-    elementName: 'Dashboard',
-    path: '/dashboard',
-    pathRegExp: /\/dashboard$/
+    name: 'Add Url',
+    elementName: 'AddUrl',
+    path: '/add',
+    pathRegExp: /\/add$/
+  },
+  {
+    name: 'Edit Url',
+    elementName: 'EditUrl',
+    path: '/edit/:id',
+    pathRegExp: /\/edit\/[\w-]+$/
+  },
+  {
+    name: 'Handle Slug',
+    elementName: 'HandleSlug',
+    path: '/:slug',
+    pathRegExp: /\/[\w-]+$/
   }
 ]
 

@@ -29,18 +29,11 @@ export const HeaderView = ({ currentUser, currentThemeType, logout }: Props) => 
           <ThemePicker />
           {currentUser && (
             <NavDropdown title={currentUser.username}>
-              <NavDropdown.Item active={pathname === '/dashboard'} onClick={() => navigate('/dashboard')}>
+              <NavDropdown.Item active={pathname === '/'} onClick={() => navigate('/')}>
                 Dashboard
               </NavDropdown.Item>
-              <NavDropdown.Item active={pathname === '/subscription'} onClick={() => navigate('/subscription')}>
-                Subscribe
-              </NavDropdown.Item>
-              <NavDropdown.Item active={pathname === '/subscriptions'} onClick={() => navigate('/subscriptions')}>
-                Subscriptions
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item active={pathname === '/settings'} onClick={() => navigate('/settings')}>
-                Settings
+              <NavDropdown.Item active={pathname === '/add'} onClick={() => navigate('/add')}>
+                Add Url
               </NavDropdown.Item>
               <NavDropdown.Divider />
               <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
