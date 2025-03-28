@@ -13,6 +13,7 @@
     "@sentry/browser": "^8.41.0",
     "@sentry/cli": "^2.39.1",
     "@sentry/react": "^8.41.0",
+    "backend-client": "file:./local-packages/backend-0.0.0.tgz",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "class-validator": "^0.14.1",
