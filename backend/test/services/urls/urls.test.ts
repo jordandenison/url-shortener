@@ -277,6 +277,35 @@ describe('urls service', () => {
     }
   })
 
+  it('does not allow a user to create an invalid slug', async () => {
+    const [client] = await createAndAuthTestUserAndClient(appUrl)
+
+    const urlData1: UrlData = {
+      value: 'https://example.com/unique-page',
+      slug: 'add'
+    }
+    const urlData2: UrlData = {
+      value: 'https://example.com/another-page',
+      slug: 'edit'
+    }
+
+    try {
+      await client.service('urls').create(urlData1)
+      assert.fail('Should have thrown an error')
+    } catch (error: any) {
+      assert(error instanceof BadRequest)
+      assert.strictEqual(error.message, 'Invalid slug: add')
+    }
+
+    try {
+      await client.service('urls').create(urlData2)
+      assert.fail('Should have thrown an error')
+    } catch (error: any) {
+      assert(error instanceof BadRequest)
+      assert.strictEqual(error.message, 'Invalid slug: edit')
+    }
+  })
+
   it('does not allow a user to create a duplicate url', async () => {
     const [client] = await createAndAuthTestUserAndClient(appUrl)
 

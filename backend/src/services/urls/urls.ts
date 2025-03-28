@@ -14,6 +14,7 @@ import { retryOnDuplicateSlugCollision } from './hooks/retry-on-duplicate-slug-c
 import { setSlug } from './hooks/set-slug'
 import { setVisits } from './hooks/set-visits'
 import { setUserId } from './hooks/set-user-id'
+import { throwErrorOnInvalidSlug } from './hooks/throw-error-on-invalid-slug'
 
 import { UrlService, getOptions } from './urls.class'
 import { urlPath, urlMethods } from './urls.shared'
@@ -32,8 +33,8 @@ export const url = (app: Application) => {
     },
     before: {
       all: [schemaHooks.validateQuery(urlQueryValidator), schemaHooks.resolveQuery(urlQueryResolver)],
-      create: [schemaHooks.validateData(urlDataValidator), setSlug, setCreatedAt, setUpdatedAt, setVisits, setUserId],
-      patch: [schemaHooks.validateData(urlPatchValidator), setUpdatedAt]
+      create: [schemaHooks.validateData(urlDataValidator), throwErrorOnInvalidSlug, setSlug, setCreatedAt, setUpdatedAt, setVisits, setUserId],
+      patch: [schemaHooks.validateData(urlPatchValidator), throwErrorOnInvalidSlug, setUpdatedAt]
     },
     error: {
       create: [retryOnDuplicateSlugCollision]
