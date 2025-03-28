@@ -10,8 +10,6 @@ import { Header } from '../Header'
 import { Auth } from '../Auth'
 import { Toasts } from '../Toasts'
 
-import './styles.css'
-
 interface Props {
   children: ReactNode
   loggedIn: boolean
@@ -20,33 +18,31 @@ interface Props {
 
 export const LayoutView = ({ children, loggedIn, loading }: Props) => {
   return (
-    <>
-      <Container className="layout-container">
-        <ThemeSetter />
-        <Toasts />
-        <Row style={{ height: '70px' }}>
-          <Header />
+    <Container className="mx-auto px-3" style={{ maxWidth: '800px', minWidth: '600px' }}>
+      <ThemeSetter />
+      <Toasts />
+      <Row style={{ height: '70px' }}>
+        <Header />
+      </Row>
+      {loading ? (
+        <Row style={{ minHeight: '50vh' }}>
+          <Col style={{ padding: '15px' }}>
+            <Loading />
+          </Col>
         </Row>
-        {loading ? (
-          <Row style={{ minHeight: '50vh' }}>
-            <Col style={{ padding: '15px' }}>
-              <Loading />
-            </Col>
-          </Row>
-        ) : loggedIn ? (
-          <Row style={{ minHeight: '50vh' }}>
-            <Col style={{ padding: '15px' }}>{children}</Col>
-          </Row>
-        ) : (
-          <Row style={{ minHeight: '50vh' }}>
-            <Col className="text-center">
-              <h3 className="loading-header">
-                <Auth />
-              </h3>
-            </Col>
-          </Row>
-        )}
-      </Container>
-    </>
+      ) : loggedIn ? (
+        <Row style={{ minHeight: '50vh' }}>
+          <Col style={{ padding: '15px' }}>{children}</Col>
+        </Row>
+      ) : (
+        <Row style={{ minHeight: '50vh' }}>
+          <Col className="text-center">
+            <h3 className="loading-header">
+              <Auth />
+            </h3>
+          </Col>
+        </Row>
+      )}
+    </Container>
   )
 }

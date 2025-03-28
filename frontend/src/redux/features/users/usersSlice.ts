@@ -8,6 +8,7 @@ import { createToast } from '../toasts/toastsSlice'
 import type { User, UserData, UserPatch } from '../../../models/User'
 
 export interface DataState {
+  authenitcating: boolean
   loading: boolean
   modifying: boolean
 
@@ -16,13 +17,14 @@ export interface DataState {
 }
 
 const initialState: DataState = {
+  authenitcating: false,
   loading: false,
   modifying: false
 }
 
 interface ILoginParams {
-  username: string
-  password: string
+  username?: string
+  password?: string
 }
 
 interface ICreateParams {
@@ -39,11 +41,14 @@ interface IPatchParams {
 
 export const loginAsync = createAsyncThunk('users/login', async ({ username, password }: ILoginParams, { dispatch }): Promise<User> => {
   try {
-    const result = await client.authenticate({
-      strategy: 'local',
-      username,
-      password
-    })
+    const result =
+      username && password
+        ? await client.authenticate({
+            strategy: 'local',
+            username,
+            password
+          })
+        : await client.reAuthenticate()
     return result.user
   } catch (e: unknown) {
     dispatch(createToast({ type: 'error', message: `Error logging in: ${(e as Error).message}` }))
@@ -80,11 +85,12 @@ export const patchAsync = createAsyncThunk('users/patch', async ({ id, data, par
 
 const handleLoginPending = (state: DataState) => {
   delete state.currentUser
-  state.loading = true
+  state.authenitcating = true
   delete state.errorMessage
 }
 
 const handleFulfilled = (state: DataState, action: PayloadAction<User>) => {
+  state.authenitcating = false
   state.currentUser = action.payload
   state.loading = false
 }
@@ -92,6 +98,7 @@ const handleFulfilled = (state: DataState, action: PayloadAction<User>) => {
 const handleLoginRejected = (state: DataState, action: { error: { message?: string } }) => {
   state.errorMessage = action.error.message
   state.loading = false
+  state.authenitcating = false
   delete state.currentUser
 }
 

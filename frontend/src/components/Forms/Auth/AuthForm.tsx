@@ -5,12 +5,8 @@ import { Form, Button } from 'react-bootstrap'
 interface AuthFormInputs {
   username: string
   password: string
-  confirmPassword?: string
-}
 
-interface AuthPayload {
-  username: string
-  password: string
+  confirmPassword?: string
 }
 
 interface AuthFormProps {
@@ -44,7 +40,7 @@ export const AuthForm = ({ loading, onLogin, onRegister }: AuthFormProps) => {
         <Form.Control type="text" placeholder="Enter username" {...register('username', { required: 'Username is required' })} isInvalid={!!errors.username} />
         {errors.username && <Form.Control.Feedback type="invalid">{errors.username.message}</Form.Control.Feedback>}
       </Form.Group>
-      <Form.Group controlId="password" className="mt-3">
+      <Form.Group controlId="password" className="my-3">
         <Form.Label>Password</Form.Label>
         <Form.Control
           type="password"

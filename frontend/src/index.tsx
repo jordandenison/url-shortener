@@ -2,10 +2,13 @@ import { createRoot } from 'react-dom/client'
 import client from './lib/feathers/feathersClient'
 import { SyncManager } from './lib/feathers/syncManager'
 
+import { loginAsync } from './redux/features/users'
+import { store } from './redux/store'
+
 import App from './App'
 
 if (window.localStorage.getItem('feathers-jwt') || window.localStorage.getItem('feathers-rt')) {
-  client.reAuthenticate()
+  store.dispatch(loginAsync({}))
 }
 
 client.on('login', () => {

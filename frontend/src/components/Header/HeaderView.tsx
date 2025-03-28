@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import Container from 'react-bootstrap/Container'
-import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 
@@ -20,34 +19,34 @@ export const HeaderView = ({ currentUser, currentThemeType, logout }: Props) => 
   const navigate = useNavigate()
 
   return (
-    <Navbar bg={currentThemeType} variant={currentThemeType} className="justify-content-end" fixed="top">
+    <Navbar bg={currentThemeType} variant={currentThemeType} fixed="top">
       <Container>
-        <Nav>
-          <Navbar.Brand onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-            Url Shortener
-          </Navbar.Brand>
-        </Nav>
+        <Navbar.Brand onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          Url Shortener
+        </Navbar.Brand>
 
-        <ThemePicker />
-        {currentUser && (
-          <NavDropdown title={currentUser?.username}>
-            <NavDropdown.Item active={pathname === '/dashboard'} onClick={() => navigate('/dashboard')}>
-              Dashboard
-            </NavDropdown.Item>
-            <NavDropdown.Item active={pathname === '/subscription'} onClick={() => navigate('/subscription')}>
-              Subscribe
-            </NavDropdown.Item>
-            <NavDropdown.Item active={pathname === '/subscriptions'} onClick={() => navigate('/subscriptions')}>
-              Subscriptions
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item active={pathname === '/settings'} onClick={() => navigate('/settings')}>
-              Settings
-            </NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
-          </NavDropdown>
-        )}
+        <div className="ms-auto d-flex align-items-center gap-3">
+          <ThemePicker />
+          {currentUser && (
+            <NavDropdown title={currentUser.username}>
+              <NavDropdown.Item active={pathname === '/dashboard'} onClick={() => navigate('/dashboard')}>
+                Dashboard
+              </NavDropdown.Item>
+              <NavDropdown.Item active={pathname === '/subscription'} onClick={() => navigate('/subscription')}>
+                Subscribe
+              </NavDropdown.Item>
+              <NavDropdown.Item active={pathname === '/subscriptions'} onClick={() => navigate('/subscriptions')}>
+                Subscriptions
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item active={pathname === '/settings'} onClick={() => navigate('/settings')}>
+                Settings
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+            </NavDropdown>
+          )}
+        </div>
       </Container>
     </Navbar>
   )
