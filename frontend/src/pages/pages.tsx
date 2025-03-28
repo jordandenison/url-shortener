@@ -3,8 +3,6 @@ export interface Page {
   name: string
   path: string
   pathRegExp: RegExp
-
-  secure?: boolean
 }
 
 const pages: Page[] = [
@@ -18,8 +16,7 @@ const pages: Page[] = [
     name: 'Dashboard',
     elementName: 'Dashboard',
     path: '/dashboard',
-    pathRegExp: /\/dashboard$/,
-    secure: true
+    pathRegExp: /\/dashboard$/
   }
 ]
 

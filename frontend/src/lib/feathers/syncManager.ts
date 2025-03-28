@@ -1,7 +1,7 @@
+import client from './feathersClient'
+
 import { store } from '../../redux/store'
 import { dataAdded as urlDataAdded, findAsync as findUrlsAsync } from '../../redux/features/urls/urlsSlice'
-
-import client from './feathersClient'
 
 import type { Url } from '../../models/Url'
 

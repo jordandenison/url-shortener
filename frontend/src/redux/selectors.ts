@@ -3,6 +3,10 @@ import type { RootState } from './store'
 // modal
 export const selectShowModal = (modalName: string, state: RootState) => state.modal[modalName]
 
+// theme
+export const selectCurrentTheme = (state: RootState) => state.theme.currentTheme
+export const selectCurrentThemeType = (state: RootState) => state.theme.currentThemeType
+
 // toasts
 export const selectToasts = (state: RootState) => state.toasts.data
 

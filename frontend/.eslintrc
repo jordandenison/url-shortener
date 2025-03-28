@@ -48,7 +48,9 @@
         "ignoreExports": [
           "src/index.tsx",
           "src/setupTests.ts",
-          "src/react-app-env.d.ts"
+          "src/react-app-env.d.ts",
+          "src/redux/selectors.ts",
+          "src/redux/store.ts"
         ]
       }
     ],
