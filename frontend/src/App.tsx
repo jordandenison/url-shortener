@@ -21,7 +21,7 @@ const App = () => {
     }
   }, [])
 
-  if (!isCssLoaded) {
+  if (process.env.NODE_ENV !== 'test' && !isCssLoaded) {
     return <div></div>
   }
 

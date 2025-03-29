@@ -5,5 +5,5 @@ import App from './App'
 test('renders App', async () => {
   const { findByText } = render(<App />)
 
-  expect(await findByText(/Dashboard/i)).toBeInTheDocument()
+  expect(await findByText(/Url Shortener/i)).toBeInTheDocument()
 })

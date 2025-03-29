@@ -50,7 +50,8 @@
           "src/setupTests.ts",
           "src/react-app-env.d.ts",
           "src/redux/selectors.ts",
-          "src/redux/store.ts"
+          "src/redux/store.ts",
+          "src/**/*.test.tsx"
         ]
       }
     ],
