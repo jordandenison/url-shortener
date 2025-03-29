@@ -1,29 +1,45 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Container from 'react-bootstrap/Container'
-import Row from 'react-bootstrap/Row'
-import Col from 'react-bootstrap/Col'
 import Button from 'react-bootstrap/Button'
+import Container from 'react-bootstrap/Container'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
 
-import type { Url, UrlPatch } from '../../../models/Url'
+import type { Url, UrlData, UrlPatch } from '../../../models/Url'
 
 import { Modal } from '../../Modal'
 import { LoadingView as Loading } from '../../Loading'
 
+import { UrlForm } from '../../Forms/Url'
+
 interface Props {
+  load: (urlId: string) => void
   loading: boolean
+  modifying: boolean
   openModal: (modalName: string) => void
   patchUrl: (data: UrlPatch) => void
   removeUrl: () => Promise<void>
+  urlId: string
 
   url?: Url
 }
 
-export const EditUrlView = ({ loading, openModal, patchUrl, removeUrl, url }: Props) => {
+export const EditUrlView = ({ load, loading, openModal, modifying, patchUrl, removeUrl, url, urlId }: Props) => {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!url) {
+      load(urlId)
+    }
+  }, [load, url, urlId])
 
   const handleConfirmRemoveUrl = async (): Promise<void> => {
     await removeUrl()
     navigate('/')
+  }
+
+  const handleOnSubmit = (data: UrlData | UrlPatch): void => {
+    patchUrl(data)
   }
 
   return loading ? (
@@ -31,16 +47,18 @@ export const EditUrlView = ({ loading, openModal, patchUrl, removeUrl, url }: Pr
   ) : (
     <Container>
       <Row className="mb-3">
-        <Col md={2}>
-          <Button id="poll-detail-view-back-button" onClick={() => navigate('/')}>
-            Back
-          </Button>
+        <Col md={3}>
+          <Button onClick={() => navigate('/')}>Back</Button>
         </Col>
-        <Col md={{ offset: 1, span: 6 }}>Edit Url</Col>
-        <Col className="text-end" md={{ offset: 1, span: 2 }}>
-          <Button variant="danger" className="mb-3" onClick={() => openModal('confirmRemoveUrl')}>
+        <Col className="text-end" md={{ offset: 6, span: 3 }}>
+          <Button variant="danger" onClick={() => openModal('confirmRemoveUrl')}>
             Remove URL
           </Button>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={{ offset: 3, span: 6 }}>
+          <UrlForm onSubmit={handleOnSubmit} modifying={modifying} url={url} />
         </Col>
       </Row>
       <Modal modalName="confirmRemoveUrl" title="Confirm Remove Url" accept={handleConfirmRemoveUrl} saveButtonText="Remove">

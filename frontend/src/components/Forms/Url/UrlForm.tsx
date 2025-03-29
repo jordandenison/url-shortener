@@ -30,7 +30,7 @@ export const UrlForm = ({ modifying, onSubmit, url }: UrlFormProps) => {
         <Form.Label>URL</Form.Label>
         <Form.Control
           type="text"
-          placeholder="Enter the full URL"
+          placeholder="https://example.com"
           {...register('value', {
             required: 'URL is required',
             validate: isValidHttpUrl
@@ -47,7 +47,7 @@ export const UrlForm = ({ modifying, onSubmit, url }: UrlFormProps) => {
         </Form.Group>
       )}
 
-      <div className="mt-3">
+      <div className="mt-3 text-center">
         <Button variant="primary" type="submit" disabled={modifying}>
           {url?.id ? 'Update' : 'Shorten'}
         </Button>

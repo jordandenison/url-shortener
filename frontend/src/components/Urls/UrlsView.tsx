@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
@@ -52,6 +52,10 @@ export const UrlsView = ({
   const [idToRemove, setIdToRemove] = useState<number>(0)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    findUrls('', 10, 0, 'id', 1)
+  }, [findUrls])
+
   const handleConfirmRemoveUrl = async (): Promise<void> => {
     await removeUrl(idToRemove)
     navigate('/')
@@ -78,7 +82,7 @@ export const UrlsView = ({
   }
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    findUrls(event.target.value, limit, skip, sort, sortOrder)
+    findUrls(event.target.value, limit, 0, sort, sortOrder)
   }
 
   return (
@@ -102,7 +106,7 @@ export const UrlsView = ({
           </InputGroup>
         </Col>
       </Row>
-      {!urls.length ? (
+      {!loading && !urls.length ? (
         <h2 className="text-center" style={{ marginTop: '32vh' }}>
           {search?.length ? 'No URLs found.' : 'You have not created any URLs yet.'}
         </h2>
