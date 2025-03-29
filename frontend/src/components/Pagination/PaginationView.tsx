@@ -19,11 +19,33 @@ export const PaginationView = ({ total, limit, skip, onPageChange }: Props) => {
 
   const getPageItems = () => {
     const items = []
+    const range = 2
 
-    for (let page = 1; page <= totalPages; page++) {
+    const start = Math.max(currentPage - range, 1)
+    const end = Math.min(currentPage + range, totalPages)
+
+    if (start > 1) {
+      items.push(
+        <Pagination.Item key={1} onClick={() => handleClick(1)}>
+          1
+        </Pagination.Item>
+      )
+      if (start > 2) items.push(<Pagination.Ellipsis key="start-ellipsis" disabled />)
+    }
+
+    for (let page = start; page <= end; page++) {
       items.push(
         <Pagination.Item key={page} active={page === currentPage} onClick={() => handleClick(page)}>
           {page}
+        </Pagination.Item>
+      )
+    }
+
+    if (end < totalPages) {
+      if (end < totalPages - 1) items.push(<Pagination.Ellipsis key="end-ellipsis" disabled />)
+      items.push(
+        <Pagination.Item key={totalPages} onClick={() => handleClick(totalPages)}>
+          {totalPages}
         </Pagination.Item>
       )
     }
