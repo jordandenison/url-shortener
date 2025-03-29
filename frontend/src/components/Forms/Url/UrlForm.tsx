@@ -24,7 +24,8 @@ export const UrlForm = ({ createToast, modifying, onSubmit, url }: UrlFormProps)
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
+    setValue
   } = useForm<UrlData | UrlPatch>({
     defaultValues: {
       value: url?.value || '',
@@ -42,6 +43,10 @@ export const UrlForm = ({ createToast, modifying, onSubmit, url }: UrlFormProps)
 
     if (result && !url?.id) {
       setCreatedSlug(result.slug)
+    }
+
+    if (result && !data.slug) {
+      setValue('slug', result.slug)
     }
   }
 

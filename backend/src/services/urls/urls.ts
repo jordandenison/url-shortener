@@ -41,10 +41,11 @@ export const url = (app: Application) => {
     before: {
       all: [schemaHooks.validateQuery(urlQueryValidator), schemaHooks.resolveQuery(urlQueryResolver)],
       create: [handleEmptySlug, schemaHooks.validateData(urlDataValidator), throwErrorOnInvalidSlug, setSlug, setCreatedAt, setUpdatedAt, setVisits, setUserId],
-      patch: [schemaHooks.validateData(urlPatchValidator), throwErrorOnInvalidSlug, setUpdatedAt]
+      patch: [handleEmptySlug, schemaHooks.validateData(urlPatchValidator), setSlug, throwErrorOnInvalidSlug, setUpdatedAt]
     },
     after: {
-      create: [setCurrentSlug]
+      create: [setCurrentSlug],
+      patch: [setCurrentSlug]
     },
     error: {
       create: [retryOnDuplicateSlugCollision]
