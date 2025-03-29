@@ -88,15 +88,14 @@ export const UrlsView = ({
   return (
     <Container>
       <Row className="align-items-center mb-3">
-        <Col>
+        <Col xs="12" md="4">
           <h3 className="mb-0">Your URLs</h3>
         </Col>
-        <Col xs="12" sm="6" md="6" lg="6">
+        <Col xs="12" md="5" className="mt-2 mt-md-0">
           <InputGroup>
             <InputGroup.Text className={`border-end-0 ${currentThemeType === 'dark' ? 'bg-dark text-light border-light' : ''}`}>
               <i className="bi bi-search text-muted" />
             </InputGroup.Text>
-
             <Form.Control
               placeholder="Search..."
               className={`${currentThemeType === 'dark' ? 'bg-dark text-light border-start-0 border-light' : 'border-start-0'}`}
@@ -105,7 +104,14 @@ export const UrlsView = ({
             />
           </InputGroup>
         </Col>
+        <Col xs="12" md="3" className="mt-2 mt-md-0 text-md-end">
+          <Button onClick={() => navigate('/add')}>
+            <i className="bi bi-plus me-2" />
+            Add URL
+          </Button>
+        </Col>
       </Row>
+
       {!loading && !urls.length ? (
         <h2 className="text-center" style={{ marginTop: '32vh' }}>
           {search?.length ? 'No URLs found.' : 'You have not created any URLs yet.'}
