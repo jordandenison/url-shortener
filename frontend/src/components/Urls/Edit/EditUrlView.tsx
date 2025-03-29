@@ -13,18 +13,19 @@ import { LoadingView as Loading } from '../../Loading'
 import { UrlForm } from '../../Forms/Url'
 
 interface Props {
+  createToast: (message: string) => void
   load: (urlId: string) => void
   loading: boolean
   modifying: boolean
   openModal: (modalName: string) => void
-  patchUrl: (data: UrlPatch) => void
+  patchUrl: (data: UrlPatch) => Promise<Url | undefined>
   removeUrl: () => Promise<void>
   urlId: string
 
   url?: Url
 }
 
-export const EditUrlView = ({ load, loading, openModal, modifying, patchUrl, removeUrl, url, urlId }: Props) => {
+export const EditUrlView = ({ createToast, load, loading, openModal, modifying, patchUrl, removeUrl, url, urlId }: Props) => {
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -38,8 +39,8 @@ export const EditUrlView = ({ load, loading, openModal, modifying, patchUrl, rem
     navigate('/')
   }
 
-  const handleOnSubmit = (data: UrlData | UrlPatch): void => {
-    patchUrl(data)
+  const handleOnSubmit = async (data: UrlData | UrlPatch): Promise<Url | undefined> => {
+    return await patchUrl(data)
   }
 
   return loading ? (
@@ -58,7 +59,7 @@ export const EditUrlView = ({ load, loading, openModal, modifying, patchUrl, rem
       </Row>
       <Row>
         <Col md={{ offset: 3, span: 6 }}>
-          <UrlForm onSubmit={handleOnSubmit} modifying={modifying} url={url} />
+          <UrlForm createToast={createToast} onSubmit={handleOnSubmit} modifying={modifying} url={url} />
         </Col>
       </Row>
       <Modal modalName="confirmRemoveUrl" title="Confirm Remove Url" accept={handleConfirmRemoveUrl} saveButtonText="Remove">

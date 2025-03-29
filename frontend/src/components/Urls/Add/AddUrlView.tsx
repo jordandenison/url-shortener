@@ -12,19 +12,16 @@ import { UrlForm } from '../../Forms/Url'
 
 interface Props {
   addUrl: (data: UrlData | UrlPatch) => Promise<Url | undefined>
+  createToast: (message: string) => void
   loading: boolean
   modifying: boolean
 }
 
-export const AddUrlView = ({ addUrl, loading, modifying }: Props) => {
+export const AddUrlView = ({ addUrl, createToast, loading, modifying }: Props) => {
   const navigate = useNavigate()
 
-  const handleOnSubmit = async (data: UrlData | UrlPatch): Promise<void> => {
-    const url = await addUrl(data)
-
-    if (url) {
-      navigate('/')
-    }
+  const handleOnSubmit = async (data: UrlData | UrlPatch): Promise<Url | undefined> => {
+    return await addUrl(data)
   }
 
   return loading ? (
@@ -43,7 +40,7 @@ export const AddUrlView = ({ addUrl, loading, modifying }: Props) => {
       </Row>
       <Row>
         <Col md={{ offset: 3, span: 6 }}>
-          <UrlForm onSubmit={handleOnSubmit} modifying={modifying} />
+          <UrlForm createToast={createToast} onSubmit={handleOnSubmit} modifying={modifying} />
         </Col>
       </Row>
     </Container>

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import type { AppDispatch, RootState } from '../../../redux/store'
 import { selectUrlsLoading, selectUrlsModifying } from '../../../redux/selectors'
 import { createAsync } from '../../../redux/features/urls'
+import { createToast } from '../../../redux/features/toasts'
 
 import type { Url, UrlData, UrlPatch } from '../../../models/Url'
 
@@ -23,6 +24,9 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
     } catch (e: unknown) {
       return
     }
+  },
+  createToast: (message: string) => {
+    dispatch(createToast({ type: 'success', message }))
   }
 })
 
