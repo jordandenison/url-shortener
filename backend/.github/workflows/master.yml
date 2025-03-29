@@ -1,0 +1,144 @@
+name: "Publish Image and Client Package"
+
+on:
+  push:
+    branches:
+      - disabled
+
+env:
+  ECR_REPOSITORY: backend
+  ECR_REPOSITORY_MIGRATIONS: migrations
+  RUN_MIGRATIONS: false
+  DEPLOY_CLIENT: false
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}-${{ github.workflow }}
+      cancel-in-progress: false
+    environment: production
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Check for deploy client and run migrations
+        id: deploy-client-check
+        run: |
+          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
+          if echo "$COMMIT_MESSAGE" | grep -q "deploy client"; then
+            echo "DEPLOY_CLIENT=true" >> $GITHUB_ENV
+          fi
+          if echo "$COMMIT_MESSAGE" | grep -q "run migrations"; then
+            echo "RUN_MIGRATIONS=true" >> $GITHUB_ENV
+          fi
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::1234567891011:role/GithubActions
+          aws-region: us-east-2
+
+      - name: Run docker compose and tests
+        id: test-code
+        run: |
+          docker compose up --detach --wait --wait-timeout 30
+          aws ses verify-email-identity --email-address no-reply@url.shortener --endpoint-url=http://localhost:4566
+          docker compose exec backend npm run migrate
+          docker compose exec backend npm run generate:grpc
+          docker compose exec bot-manager-test npm run generate:grpc
+          docker compose exec backend npm test
+
+      - name: Setup SSH Tunnel for Kubernetes Deployment
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H bastion-production.url.shortener >> ~/.ssh/known_hosts
+          echo "$SSH_PRIVATE_KEY" > id_rsa
+          chmod 600 id_rsa
+          ssh -f -o ExitOnForwardFailure=yes -D 1080 -i ./id_rsa ubuntu@bastion-production.url.shortener -N
+
+      - name: Configure Kubernetes
+        run: aws eks update-kubeconfig --region us-east-2 --name eks-production
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Checkout url-shortener Repository
+        uses: actions/checkout@v4
+        with:
+          repository: "jordandenison/url-shortener"
+          token: ${{ secrets.PAT }}
+          path: "url-shortener"
+
+      - name: Download RDS Certificate
+        run: curl -o rds.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+
+      - name: Build, Tag, and Push Migrations Image to Amazon ECR and Deploy to Kubernetes
+        id: build-and-tag-migrations-image
+        if: env.RUN_MIGRATIONS == 'true'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_MIGRATIONS:$IMAGE_TAG -f Dockerfile_migrations .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_MIGRATIONS:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_MIGRATIONS:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          sed -i 's|migrations-production:[^"]*|migrations-production:${{ github.sha }}|' ./url-shortener/kubernetes/production/jobs/migrate.yml
+
+      - name: Build, Tag, and Push Image to Amazon ECR
+        id: build-and-tag-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+          find . -type f -name '*.yml' ! -name 'migrate.yml' -print0 | xargs -0 sed -i 's|backend-production:[^"]*|backend-production:${{ github.sha }}|g'
+
+      - name: Update Github Repo with Image Tags
+        run: |
+          cd url-shortener
+          git config --local user.email "jordan@denisonweb.com"
+          git config --local user.name "Jordan Denison"
+          git add .
+          git commit -m "Update production image tags"
+          git push
+
+      - name: Deploy Migrations if Changed
+        if: env.RUN_MIGRATIONS == 'true'
+        env:
+          HTTPS_PROXY: socks5://localhost:1080
+        run: |
+          kubectl delete job api-migrations --ignore-not-found
+          kubectl apply -f ./url-shortener/kubernetes/production/jobs/migrate.yml
+
+      - name: Deploy API Gateway
+        env:
+          HTTPS_PROXY: socks5://localhost:1080
+        run: kubectl apply -f ./url-shortener/kubernetes/production/api-gateway/api-gateway.deployment.yml
+
+      - name: Run Publish to NPM
+        id: publish-client
+        if: env.DEPLOY_CLIENT == 'true'
+        run: |
+          echo "Publishing client package"
+          docker compose exec backend npm run build
+          docker compose exec backend git checkout -- lib/package.json
+          docker compose exec backend git config --local user.email "jordan@denisonweb.com"
+          docker compose exec backend git config --local user.name "Jordan Denison"
+          docker compose exec -e NPM_TOKEN="${{ secrets.NPM_TOKEN }}" backend sh -c 'echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > lib/.npmrc'
+          docker compose exec backend npm run publish-client
+          docker compose exec backend git add .
+          docker compose exec backend git commit -m "chore: publish client"
+          docker compose exec backend git push

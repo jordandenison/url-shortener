@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 100
+      maxUnavailable: 0
+    type: RollingUpdate
+  replicas: 1000000
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 058264214606.dkr.ecr.us-east-2.amazonaws.com/backend:cabb4a45ce6a4d40cab106149f465fa5c18c8d26
+          resources:
+            requests:
+              cpu: 100m
+              memory: 200Mi
+            limits:
+              cpu: 200m
+              memory: 400Mi
+          ports:
+            - containerPort: 3002
+              name: http
+          startupProbe:
+            httpGet:
+              path: /health/liveness
+              port: 3002
+            failureThreshold: 24
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 3002
+            periodSeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 3002
+            periodSeconds: 10
+            timeoutSeconds: 3
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3002"
+            - name: HOSTNAME
+              value: "url.shortener"
+            - name: DATABASE_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: endpoint
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: cache
+                  key: endpoint
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cache
+                  key: password
+            - name: FEATHERS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: rtninja-secrets
+                  key: feathers_secret
