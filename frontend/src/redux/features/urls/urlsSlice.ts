@@ -53,6 +53,7 @@ interface IPatchParams extends IRemoveParams {
 }
 
 interface IFindParams {
+  id?: number
   search?: string
   limit?: number
   skip?: number
@@ -64,11 +65,15 @@ interface IFindParams {
 export const findAsync = createAsyncThunk(
   'urls/find',
   async (
-    { search, limit, skip, slug, sort, sortOrder }: IFindParams,
+    { id, limit, search, skip, slug, sort, sortOrder }: IFindParams,
     { dispatch }
   ): Promise<Paginated<Url> & { search?: string; sort?: string; sortOrder?: number }> => {
     try {
       const query: Params['query'] = {}
+
+      if (id) {
+        query.id = id
+      }
 
       if (limit) {
         query.$limit = limit
@@ -102,7 +107,9 @@ export const findAsync = createAsyncThunk(
 
 export const createAsync = createAsyncThunk('urls/create', async ({ data, params }: ICreateParams, { dispatch }): Promise<Url> => {
   try {
-    return await client.service('urls').create(data, params)
+    const result = await client.service('urls').create(data, params)
+    dispatch(createToast({ type: 'success', message: `URL "${result.value}" created successfully` }))
+    return result
   } catch (e: unknown) {
     dispatch(createToast({ type: 'error', message: `Error creating url: ${(e as Error).message}` }))
     throw e
@@ -111,7 +118,9 @@ export const createAsync = createAsyncThunk('urls/create', async ({ data, params
 
 export const patchAsync = createAsyncThunk('urls/patch', async ({ id, data, params }: IPatchParams, { dispatch }): Promise<Url> => {
   try {
-    return await client.service('urls').patch(id, data, params)
+    const result = await client.service('urls').patch(id, data, params)
+    dispatch(createToast({ type: 'success', message: `URL "${result.value}" updated successfully` }))
+    return result
   } catch (e: unknown) {
     dispatch(createToast({ type: 'error', message: `Error updating url: ${(e as Error).message}` }))
     throw e
@@ -120,7 +129,9 @@ export const patchAsync = createAsyncThunk('urls/patch', async ({ id, data, para
 
 export const removeAsync = createAsyncThunk('urls/remove', async ({ id, params }: IRemoveParams, { dispatch }): Promise<Url> => {
   try {
-    return await client.service('urls').remove(id, params)
+    const result = await client.service('urls').remove(id, params)
+    dispatch(createToast({ type: 'success', message: `URL "${result.value}" removed successfully` }))
+    return result
   } catch (e: unknown) {
     dispatch(createToast({ type: 'error', message: `Error removing url: ${(e as Error).message}` }))
     throw e

@@ -59,6 +59,7 @@ export const loginAsync = createAsyncThunk('users/login', async ({ username, pas
 export const logoutAsync = createAsyncThunk('users/logout', async (_, { dispatch }): Promise<void> => {
   try {
     await client.logout()
+    dispatch(createToast({ type: 'success', message: 'Logout successful' }))
   } catch (e: unknown) {
     dispatch(createToast({ type: 'error', message: `Error logging out: ${(e as Error).message}` }))
     throw e
