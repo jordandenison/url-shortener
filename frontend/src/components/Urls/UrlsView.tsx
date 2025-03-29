@@ -42,7 +42,7 @@ export const UrlsView = ({
   loading,
   openModal,
   removeUrl,
-  search,
+  search = '',
   skip,
   sort,
   sortOrder,
@@ -58,15 +58,15 @@ export const UrlsView = ({
 
   const handleConfirmRemoveUrl = async (): Promise<void> => {
     await removeUrl(idToRemove)
-    navigate('/')
+    findUrls(search, limit, skip, sort, sortOrder)
   }
 
   const handleHeaderClick = (field: string): void => {
     if (sort === field) {
       const newSortOrder = sortOrder === 1 ? -1 : 1
-      findUrls(search || '', limit, skip, field, newSortOrder)
+      findUrls(search, limit, skip, field, newSortOrder)
     } else {
-      findUrls(search || '', limit, skip, field, 1)
+      findUrls(search, limit, skip, field, 1)
     }
   }
 
@@ -77,7 +77,7 @@ export const UrlsView = ({
 
   const handlePageChange = (newSkip: number): void => {
     if (skip !== newSkip) {
-      findUrls(search || '', limit, newSkip, sort, sortOrder)
+      findUrls(search, limit, newSkip, sort, sortOrder)
     }
   }
 
@@ -101,7 +101,7 @@ export const UrlsView = ({
               placeholder="Search..."
               className={`${currentThemeType === 'dark' ? 'bg-dark text-light border-start-0 border-light' : 'border-start-0'}`}
               onChange={handleSearchChange}
-              value={search || ''}
+              value={search}
             />
           </InputGroup>
         </Col>
