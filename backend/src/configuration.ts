@@ -7,10 +7,17 @@ export const configurationSchema = Type.Intersect([
   defaultAppConfiguration,
   Type.Object({
     currentSlug: Type.String(),
+    disableCache: Type.Boolean(),
     host: Type.String(),
+    nodeEnv: Type.String(),
     postgresqlTest: Type.Object({}),
     port: Type.Number(),
-    public: Type.String()
+    public: Type.String(),
+    redis: Type.Object({
+      host: Type.String(),
+      password: Type.Optional(Type.String()),
+      port: Type.Number()
+    })
   })
 ])
 

@@ -4,9 +4,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { BadRequest, MethodNotAllowed, NotFound } from '@feathersjs/errors'
 import rest from '@feathersjs/rest-client'
 
+import { Cache } from '../../../src/helpers/cache.class'
+import { getClient } from '../../../src/helpers/redis'
+
 import { createAndAuthTestUserAndClient } from '../../helpers'
 import { app } from '../../../src/app'
-import { createClient, type User, type UserPatch } from '../../../src/client'
+import { createClient, type User } from '../../../src/client'
 import { propertiesToStripExternally } from '../../../src/services/users/users.schema'
 
 const createdUsers: User[] = []
@@ -16,6 +19,10 @@ const appUrl = `http://${app.get('host')}:${port}`
 
 describe('users service', () => {
   before(async () => {
+    const redisClient = getClient(app)
+    await redisClient.connect()
+    Cache.getInstance().setClient(redisClient)
+
     await app.listen(port)
   })
 

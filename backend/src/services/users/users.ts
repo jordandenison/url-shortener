@@ -15,6 +15,7 @@ import {
 
 import type { Application } from '../../declarations'
 
+import { handleCacheGet, handleCacheSet } from '../../hooks/handle-cache'
 import { disableExternal } from '../../hooks/disable-external'
 import { setCreatedAt } from '../../hooks/set-created-at'
 import { setUpdatedAt } from '../../hooks/set-updated-at'
@@ -40,9 +41,15 @@ export const user = (app: Application) => {
     },
     before: {
       all: [schemaHooks.validateQuery(userQueryValidator), schemaHooks.resolveQuery(userQueryResolver)],
+      get: [handleCacheGet],
       create: [schemaHooks.validateData(userDataValidator), schemaHooks.resolveData(userDataResolver), setCreatedAt, setUpdatedAt],
       patch: [schemaHooks.validateData(userPatchValidator), schemaHooks.resolveData(userPatchResolver), setUpdatedAt],
       remove: [disableExternal]
+    },
+    after: {
+      get: [handleCacheSet],
+      create: [handleCacheSet],
+      patch: [handleCacheSet]
     }
   })
 }

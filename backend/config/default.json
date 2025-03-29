@@ -17,6 +17,10 @@
     "client": "pg",
     "connection": "postgres://urlshortener:urlshortener@postgres-test:5432/urlshortener"
   },
+  "redis": {
+    "host": "redis",
+    "port": 6379
+  },
   "authentication": {
     "entity": "user",
     "service": "users",
@@ -38,5 +42,7 @@
       "passwordField": "password"
     }
   },
-  "currentSlug": "aaaaa"
+  "currentSlug": "aaaaa",
+  "nodeEnv": "local-dev",
+  "disableCache": false
 }

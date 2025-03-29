@@ -7,5 +7,18 @@
   "authentication": {
     "secret": "FEATHERS_SECRET"
   },
-  "currentSlug": "INITIAL_SLUG"
+  "currentSlug": "INITIAL_SLUG",
+  "nodeEnv": "NODE_ENV",
+  "redis": {
+    "host": "REDIS_HOST",
+    "password": "REDIS_PASSWORD",
+    "port": {
+      "__name": "REDIS_PORT",
+      "__format": "number"
+    }
+  },
+  "disableCache": {
+    "__name": "DISABLE_CACHE",
+    "__format": "boolean"
+  }
 }
