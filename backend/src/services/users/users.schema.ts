@@ -11,8 +11,8 @@ import type { UserService } from './users.class'
 export const userSchema = Type.Object(
   {
     id: Type.Number(),
-    username: Type.String(),
-    password: Type.String({ minLength: 8 }),
+    username: Type.String({ minLength: 3, maxLength: 50, pattern: '^[a-zA-Z0-9_-]+$' }),
+    password: Type.String({ minLength: 8, maxLength: 64 }),
     createdAt: Type.String({ format: 'date-time' }),
     updatedAt: Type.String({ format: 'date-time' })
   },

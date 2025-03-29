@@ -3,6 +3,9 @@ import assert from 'assert'
 import { v4 as uuidv4 } from 'uuid'
 import { BadRequest, NotFound } from '@feathersjs/errors'
 
+import { Cache } from '../../../src/helpers/cache.class'
+import { getClient } from '../../../src/helpers/redis'
+
 import { createAndAuthTestUserAndClient } from '../../helpers'
 import { app } from '../../../src/app'
 import type { Url, UrlData, UrlPatch } from '../../../src/client'
@@ -13,6 +16,10 @@ const appUrl = `http://${app.get('host')}:${port}`
 
 describe('urls service', () => {
   before(async () => {
+    const redisClient = getClient(app)
+    await redisClient.connect()
+    Cache.getInstance().setClient(redisClient)
+
     await app.listen(port)
   })
 
@@ -33,11 +40,11 @@ describe('urls service', () => {
 
     const urlData1: UrlData = {
       value: 'https://example.com/page1',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const urlData2: UrlData = {
       value: 'https://example.com/page2',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const createdUrl1 = await client1.service('urls').create(urlData1)
     const createdUrl2 = await client2.service('urls').create(urlData2)
@@ -74,11 +81,11 @@ describe('urls service', () => {
 
     const urlData1: UrlData = {
       value: 'https://example.com/page3',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const urlData2: UrlData = {
       value: 'https://example.com/page4',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const createdUrl1 = await client1.service('urls').create(urlData1)
     const createdUrl2 = await client2.service('urls').create(urlData2)
@@ -173,13 +180,13 @@ describe('urls service', () => {
     const [client, user] = await createAndAuthTestUserAndClient(appUrl)
     const urlData: UrlData = {
       value: 'https://example.com/page6',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const createdUrl = await client.service('urls').create(urlData)
     createdUrls.push(createdUrl)
 
     const newValue = 'https://example.com/updated'
-    const newSlug = `slug_${uuidv4()}`
+    const newSlug = `slug-${uuidv4()}`
     const updatedUrl = await client.service('urls').patch(createdUrl.id, { value: newValue, slug: newSlug } as UrlPatch)
     assert.strictEqual(updatedUrl.value, newValue)
     assert.strictEqual(updatedUrl.slug, newSlug)
@@ -190,7 +197,7 @@ describe('urls service', () => {
     const [client] = await createAndAuthTestUserAndClient(appUrl)
     const urlData: UrlData = {
       value: 'https://example.com/page8',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const createdUrl = await client.service('urls').create(urlData)
 
@@ -260,7 +267,7 @@ describe('urls service', () => {
 
     const urlData: UrlData = {
       value: 'https://example.com/page7',
-      slug: `slug_${uuidv4()}`
+      slug: `slug-${uuidv4()}`
     }
     const createdUrl = await client2.service('urls').create(urlData)
     createdUrls.push(createdUrl)
@@ -276,7 +283,7 @@ describe('urls service', () => {
 
   it('does not allow a user to create a duplicate slug', async () => {
     const [client] = await createAndAuthTestUserAndClient(appUrl)
-    const duplicateSlug = `slug_${uuidv4()}`
+    const duplicateSlug = `slug-${uuidv4()}`
 
     const urlData1: UrlData = {
       value: 'https://example.com/unique-page',
@@ -299,32 +306,51 @@ describe('urls service', () => {
     }
   })
 
-  it('does not allow a user to create an invalid slug', async () => {
+  it('does not allow a user to create URLs with invalid values or slugs', async () => {
     const [client] = await createAndAuthTestUserAndClient(appUrl)
 
-    const urlData1: UrlData = {
-      value: 'https://example.com/unique-page',
-      slug: 'add'
-    }
-    const urlData2: UrlData = {
-      value: 'https://example.com/another-page',
-      slug: 'edit'
-    }
+    const invalidInputs = [
+      {
+        label: 'reserved slug: add',
+        data: { value: 'https://example.com/1', slug: 'add' },
+        expectedMessage: 'Invalid slug: add'
+      },
+      {
+        label: 'reserved slug: edit',
+        data: { value: 'https://example.com/2', slug: 'edit' },
+        expectedMessage: 'Invalid slug: edit'
+      },
+      {
+        label: 'invalid URL format',
+        data: { value: 'htp:/not-a-valid-url', slug: `invalid-url-${uuidv4()}` },
+        expectedMessage: 'must match format "strict-uri"'
+      },
+      {
+        label: 'slug with underscore (disallowed)',
+        data: { value: 'https://example.com/3', slug: 'invalid_slug' },
+        expectedMessage: 'must match pattern "^[a-zA-Z0-9-]+$"'
+      },
+      {
+        label: 'empty slug',
+        data: { value: 'https://example.com/4', slug: '' },
+        expectedMessage: 'must NOT have fewer than 3 characters'
+      },
+      {
+        label: 'empty value',
+        data: { value: '', slug: 'validslug456' },
+        expectedMessage: 'must NOT have fewer than 7 characters'
+      }
+    ]
 
-    try {
-      await client.service('urls').create(urlData1)
-      assert.fail('Should have thrown an error')
-    } catch (error: any) {
-      assert(error instanceof BadRequest)
-      assert.strictEqual(error.message, 'Invalid slug: add')
-    }
-
-    try {
-      await client.service('urls').create(urlData2)
-      assert.fail('Should have thrown an error')
-    } catch (error: any) {
-      assert(error instanceof BadRequest)
-      assert.strictEqual(error.message, 'Invalid slug: edit')
+    for (const { label, data, expectedMessage } of invalidInputs) {
+      try {
+        await client.service('urls').create(data)
+        assert.fail(`Should have failed for case: ${label}`)
+      } catch (error: any) {
+        assert(error instanceof BadRequest, `Expected BadRequest for case: ${label}`)
+        const msg = error?.data?.[0]?.message || error.message
+        assert(msg.includes(expectedMessage), `Unexpected error message for ${label}. Got: "${msg}"`)
+      }
     }
   })
 

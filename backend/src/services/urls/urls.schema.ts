@@ -7,12 +7,24 @@ import type { HookContext } from '../../declarations'
 import { dataValidator, queryValidator } from '../../validators'
 import type { UrlService } from './urls.class'
 
+const value = Type.String({
+  format: 'strict-uri',
+  minLength: 7,
+  maxLength: 2048
+})
+
+const slug = Type.String({
+  minLength: 3,
+  maxLength: 64,
+  pattern: '^[a-zA-Z0-9-]+$'
+})
+
 export const urlSchema = Type.Object(
   {
     id: Type.Number(),
-    value: Type.String(),
-    slug: Type.String(),
-    visits: Type.Number(),
+    value,
+    slug,
+    visits: Type.Number({ minimum: 0 }),
     userId: Type.Number(),
     createdAt: Type.String({ format: 'date-time' }),
     updatedAt: Type.String({ format: 'date-time' })
@@ -24,8 +36,8 @@ export const urlValidator = getValidator(urlSchema, dataValidator)
 
 export const urlDataSchema = Type.Object(
   {
-    value: Type.String(),
-    slug: Type.Optional(Type.String())
+    value,
+    slug: Type.Optional(slug)
   },
   {
     $id: 'UrlData',

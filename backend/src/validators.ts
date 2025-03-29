@@ -18,11 +18,23 @@ const formats: FormatsPluginOptions = [
   'regex'
 ]
 
-export const dataValidator: Ajv = addFormats(new Ajv({}), formats)
+const createAjvWithStrictUri = (options?: ConstructorParameters<typeof Ajv>[0]) => {
+  const ajv = new Ajv(options)
 
-export const queryValidator: Ajv = addFormats(
-  new Ajv({
-    coerceTypes: true
-  }),
-  formats
-)
+  ajv.addFormat('strict-uri', {
+    type: 'string',
+    validate: (data: string) => {
+      try {
+        const url = new URL(data)
+        return ['http:', 'https:'].includes(url.protocol)
+      } catch {
+        return false
+      }
+    }
+  })
+
+  return addFormats(ajv, formats)
+}
+
+export const dataValidator = createAjvWithStrictUri()
+export const queryValidator = createAjvWithStrictUri({ coerceTypes: true })

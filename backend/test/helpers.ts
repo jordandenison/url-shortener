@@ -8,7 +8,7 @@ import { createClient } from '../src/client'
 
 export const createAndAuthTestUserAndClient = async (
   appUrl: string,
-  username: string = `testUser1_${uuidv4()}`,
+  username: string = `tu1_${uuidv4()}`,
   password: string = uuidv4()
 ): Promise<[ClientApplication, User, string]> => {
   const client = createClient(rest(appUrl).axios(axios))
