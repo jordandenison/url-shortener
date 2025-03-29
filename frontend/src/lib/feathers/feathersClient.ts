@@ -6,7 +6,7 @@ import { createClient } from 'backend-client'
 
 import { url } from './config'
 
-export const socket = io(url, {
+const socket = io(url, {
   transports: ['websocket', 'polling']
 })
 

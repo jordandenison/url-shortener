@@ -8,11 +8,7 @@ import { findAsync } from '../../../redux/features/urls'
 
 import { HangleSlugView } from './HandleSlugView'
 
-interface OwnProps {
-  slug: string
-}
-
-const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
+const mapStateToProps = (state: RootState) => {
   return {
     loading: selectUrlsLoading(state),
     url: selectUrlsData(state)[0]

@@ -2,6 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Container from 'react-bootstrap/Container'
+import Col from 'react-bootstrap/Col'
+import Form from 'react-bootstrap/Form'
+import InputGroup from 'react-bootstrap/InputGroup'
+import Row from 'react-bootstrap/Row'
 import Table from 'react-bootstrap/Table'
 
 import type { Url } from '../../models/Url'
@@ -79,19 +83,25 @@ export const UrlsView = ({
 
   return (
     <Container>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="mb-0">Your Urls</h3>
-        <div className="position-relative" style={{ maxWidth: '300px', width: '100%' }}>
-          <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className={`form-control ps-5 ${currentThemeType === 'dark' ? 'bg-dark text-light border-light' : ''}`}
-            onChange={handleSearchChange}
-            value={search || ''}
-          />
-        </div>
-      </div>
+      <Row className="align-items-center mb-3">
+        <Col>
+          <h3 className="mb-0">Your URLs</h3>
+        </Col>
+        <Col xs="12" sm="6" md="6" lg="6">
+          <InputGroup>
+            <InputGroup.Text className={`border-end-0 ${currentThemeType === 'dark' ? 'bg-dark text-light border-light' : ''}`}>
+              <i className="bi bi-search text-muted" />
+            </InputGroup.Text>
+
+            <Form.Control
+              placeholder="Search..."
+              className={`${currentThemeType === 'dark' ? 'bg-dark text-light border-start-0 border-light' : 'border-start-0'}`}
+              onChange={handleSearchChange}
+              value={search || ''}
+            />
+          </InputGroup>
+        </Col>
+      </Row>
       {!urls.length ? (
         <h2 className="text-center" style={{ marginTop: '32vh' }}>
           {search?.length ? 'No URLs found.' : 'You have not created any URLs yet.'}
@@ -103,7 +113,7 @@ export const UrlsView = ({
           <thead>
             <tr>
               <th className={`col-4 ${sort === 'value' ? 'bg-light' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleHeaderClick('value')}>
-                Value {renderSortIcon('value')}
+                Target URL {renderSortIcon('value')}
               </th>
               <th className={`col-2 ${sort === 'slug' ? 'bg-light' : ''}`} style={{ cursor: 'pointer' }} onClick={() => handleHeaderClick('slug')}>
                 Slug {renderSortIcon('slug')}
