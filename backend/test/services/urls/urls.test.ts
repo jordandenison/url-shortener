@@ -331,11 +331,6 @@ describe('urls service', () => {
         expectedMessage: 'must match pattern "^[a-zA-Z0-9-]+$"'
       },
       {
-        label: 'empty slug',
-        data: { value: 'https://example.com/4', slug: '' },
-        expectedMessage: 'must NOT have fewer than 3 characters'
-      },
-      {
         label: 'empty value',
         data: { value: '', slug: 'validslug456' },
         expectedMessage: 'must NOT have fewer than 7 characters'

@@ -11,6 +11,7 @@ import { setCreatedAt } from '../../hooks/set-created-at'
 import { setUpdatedAt } from '../../hooks/set-updated-at'
 
 import { handleAnonFind } from './hooks/handle-anon-find'
+import { handleEmptySlug } from './hooks/handle-empty-slug'
 import { retryOnDuplicateSlugCollision } from './hooks/retry-on-duplicate-slug-collision'
 import { setCurrentSlug } from './hooks/set-current-slug'
 import { setSlug } from './hooks/set-slug'
@@ -39,7 +40,7 @@ export const url = (app: Application) => {
     },
     before: {
       all: [schemaHooks.validateQuery(urlQueryValidator), schemaHooks.resolveQuery(urlQueryResolver)],
-      create: [schemaHooks.validateData(urlDataValidator), throwErrorOnInvalidSlug, setSlug, setCreatedAt, setUpdatedAt, setVisits, setUserId],
+      create: [handleEmptySlug, schemaHooks.validateData(urlDataValidator), throwErrorOnInvalidSlug, setSlug, setCreatedAt, setUpdatedAt, setVisits, setUserId],
       patch: [schemaHooks.validateData(urlPatchValidator), throwErrorOnInvalidSlug, setUpdatedAt]
     },
     after: {
