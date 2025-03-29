@@ -3,6 +3,8 @@ import type { Params } from '@feathersjs/feathers'
 
 import client from '../../../lib/feathers/feathersClient'
 
+import { extractErrorMessage } from '../../../lib/errors'
+
 import { createToast } from '../toasts/toastsSlice'
 
 import type { User, UserData, UserPatch } from '../../../models/User'
@@ -50,9 +52,9 @@ export const loginAsync = createAsyncThunk('users/login', async ({ username, pas
           })
         : await client.reAuthenticate()
     return result.user
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error logging in: ${(e as Error).message}` }))
-    throw e
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error logging in: invalid login` }))
+    throw error
   }
 })
 
@@ -60,27 +62,30 @@ export const logoutAsync = createAsyncThunk('users/logout', async (_, { dispatch
   try {
     await client.logout()
     dispatch(createToast({ type: 'success', message: 'Logout successful' }))
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error logging out: ${(e as Error).message}` }))
-    throw e
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error logging out: ${extractErrorMessage(error)}` }))
+    throw error
   }
 })
 
 export const createAsync = createAsyncThunk('users/create', async ({ data, params }: ICreateParams, { dispatch }): Promise<User> => {
   try {
-    return await client.service('users').create(data, params)
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error creating user: ${(e as Error).message}` }))
-    throw e
+    const result = await client.service('users').create(data, params)
+    dispatch(loginAsync({ username: data.username, password: data.password }))
+    dispatch(createToast({ type: 'success', message: 'Registration successful' }))
+    return result
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error creating user: ${extractErrorMessage(error)}` }))
+    throw error
   }
 })
 
 export const patchAsync = createAsyncThunk('users/patch', async ({ id, data, params }: IPatchParams, { dispatch }): Promise<User> => {
   try {
     return await client.service('users').patch(id, data, params)
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error updating user: ${(e as Error).message}` }))
-    throw e
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error updating user: ${extractErrorMessage(error)}` }))
+    throw error
   }
 })
 

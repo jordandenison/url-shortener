@@ -5,6 +5,7 @@ import client from '../../../lib/feathers/feathersClient'
 
 import type { Url, UrlData, UrlPatch } from '../../../models/Url'
 
+import { extractErrorMessage } from '../../../lib/errors'
 import { mergeData, removeData } from '../../../lib/util'
 
 import { createToast } from '../toasts/toastsSlice'
@@ -98,9 +99,9 @@ export const findAsync = createAsyncThunk(
       const result = await client.service('urls').find({ query })
 
       return { ...result, search, sort, sortOrder }
-    } catch (e: unknown) {
-      dispatch(createToast({ type: 'error', message: `Error getting urls: ${(e as Error).message}` }))
-      throw e
+    } catch (error: unknown) {
+      dispatch(createToast({ type: 'error', message: `Error getting urls: ${extractErrorMessage(error)}` }))
+      throw error
     }
   }
 )
@@ -110,9 +111,9 @@ export const createAsync = createAsyncThunk('urls/create', async ({ data, params
     const result = await client.service('urls').create(data, params)
     dispatch(createToast({ type: 'success', message: `URL "${result.value}" created successfully` }))
     return result
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error creating url: ${(e as Error).message}` }))
-    throw e
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error creating url: ${extractErrorMessage(error)}` }))
+    throw error
   }
 })
 
@@ -121,9 +122,9 @@ export const patchAsync = createAsyncThunk('urls/patch', async ({ id, data, para
     const result = await client.service('urls').patch(id, data, params)
     dispatch(createToast({ type: 'success', message: `URL "${result.value}" updated successfully` }))
     return result
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error updating url: ${(e as Error).message}` }))
-    throw e
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error updating url: ${extractErrorMessage(error)}` }))
+    throw error
   }
 })
 
@@ -132,9 +133,9 @@ export const removeAsync = createAsyncThunk('urls/remove', async ({ id, params }
     const result = await client.service('urls').remove(id, params)
     dispatch(createToast({ type: 'success', message: `URL "${result.value}" removed successfully` }))
     return result
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error removing url: ${(e as Error).message}` }))
-    throw e
+  } catch (error: unknown) {
+    dispatch(createToast({ type: 'error', message: `Error removing url: ${extractErrorMessage(error)}` }))
+    throw error
   }
 })
 
