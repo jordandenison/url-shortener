@@ -1,7 +1,7 @@
 import { parseISO } from 'date-fns'
 import { format, utcToZonedTime } from 'date-fns-tz'
 
-export const formatDate = (utcDateString: string, dateFormat: string = 'MMMM d, yyyy h:mm a') => {
+const formatDate = (utcDateString: string, dateFormat: string = 'MMMM d, yyyy h:mm a') => {
   const date = parseISO(utcDateString)
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const zonedDate = utcToZonedTime(date, userTimeZone)

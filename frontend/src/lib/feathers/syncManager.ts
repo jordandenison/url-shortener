@@ -1,9 +1,9 @@
-import client from './feathersClient'
+import type { Url } from '../../models/Url'
 
 import { store } from '../../redux/store'
 import { dataAdded as urlDataAdded, findAsync as findUrlsAsync } from '../../redux/features/urls/urlsSlice'
 
-import type { Url } from '../../models/Url'
+import client from './feathersClient'
 
 export class SyncManager {
   private static running: boolean = false
@@ -20,7 +20,7 @@ export class SyncManager {
   }
 
   private static async fetchInitialData(): Promise<void> {
-    store.dispatch(findUrlsAsync())
+    store.dispatch(findUrlsAsync({}))
   }
 
   private static initSyncOnEvent(): void {

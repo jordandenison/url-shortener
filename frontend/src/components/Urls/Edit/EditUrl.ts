@@ -26,10 +26,10 @@ const mapDispatchToProps = (dispatch: AppDispatch, ownProps: OwnProps) => ({
     dispatch(open(modalName))
   },
   patchUrl: (data: UrlPatch): void => {
-    dispatch(patchAsync({ id: ownProps.urlId, data }))
+    dispatch(patchAsync({ id: +ownProps.urlId, data }))
   },
   removeUrl: async (): Promise<void> => {
-    await dispatch(removeAsync({ id: ownProps.urlId }))
+    await dispatch(removeAsync({ id: +ownProps.urlId }))
     dispatch(closeAll())
   }
 })

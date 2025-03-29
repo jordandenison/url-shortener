@@ -1,24 +1,49 @@
 import { connect } from 'react-redux'
 
 import type { AppDispatch, RootState } from '../../redux/store'
-import { selectUrlsData, selectUrlsLimit, selectUrlsLoading, selectUrlsSkip, selectUrlsTotal } from '../../redux/selectors'
+import {
+  selectCurrentThemeType,
+  selectUrlsData,
+  selectUrlsLimit,
+  selectUrlsLoading,
+  selectUrlsSearch,
+  selectUrlsSkip,
+  selectUrlsSort,
+  selectUrlsSortOrder,
+  selectUrlsTotal
+} from '../../redux/selectors'
+import { closeAll, open } from '../../redux/features/modal'
+import { findAsync, removeAsync } from '../../redux/features/urls'
+import { createToast } from '../../redux/features/toasts'
 
 import { UrlsView } from './UrlsView'
 
-interface OwnProps {
-  guildId: string
-}
+const mapStateToProps = (state: RootState) => ({
+  currentThemeType: selectCurrentThemeType(state),
+  limit: selectUrlsLimit(state),
+  loading: selectUrlsLoading(state),
+  search: selectUrlsSearch(state),
+  skip: selectUrlsSkip(state),
+  sort: selectUrlsSort(state),
+  sortOrder: selectUrlsSortOrder(state),
+  total: selectUrlsTotal(state),
+  urls: selectUrlsData(state)
+})
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
-  return {
-    limit: selectUrlsLimit(state),
-    loading: selectUrlsLoading(state),
-    skip: selectUrlsSkip(state),
-    total: selectUrlsTotal(state),
-    urls: selectUrlsData(state)
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
+  createToast: (message: string) => {
+    dispatch(createToast({ type: 'success', message }))
+  },
+  findUrls: (search: string, limit: number, skip: number, sort: string, sortOrder: number): void => {
+    dispatch(findAsync({ search, limit, skip, sort, sortOrder }))
+  },
+  openModal: (modalName: string): void => {
+    dispatch(open(modalName))
+  },
+  removeUrl: async (id: number): Promise<void> => {
+    await dispatch(removeAsync({ id }))
+    dispatch(closeAll())
   }
-}
+})
 
-const mapDispatchToProps = (dispatch: AppDispatch, ownProps: OwnProps) => ({})
-
-export const Polls = connect(mapStateToProps, mapDispatchToProps)(UrlsView)
+export const Urls = connect(mapStateToProps, mapDispatchToProps)(UrlsView)

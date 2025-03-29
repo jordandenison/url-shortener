@@ -5,11 +5,11 @@ import { EditUrl } from '../../components/Urls/Edit'
 import { Layout } from '../../components/Layout'
 
 export const EditUrlView = () => {
-  const { id } = useParams()
+  const { urlId } = useParams()
 
   return (
     <Layout>
-      <EditUrl urlId={id!} />
+      <EditUrl urlId={urlId!} />
     </Layout>
   )
 }

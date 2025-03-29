@@ -5,10 +5,10 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('urls', (table) => {
     table.increments('id')
 
-    table.string('value').notNullable()
+    table.string('value').notNullable().index()
     table.string('slug').notNullable().unique()
     table.integer('userId').notNullable().index()
-    table.integer('visits').notNullable()
+    table.integer('visits').notNullable().index()
 
     table.unique(['value', 'userId'])
 

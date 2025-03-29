@@ -21,7 +21,7 @@ const pages: Page[] = [
   {
     name: 'Edit Url',
     elementName: 'EditUrl',
-    path: '/edit/:id',
+    path: '/edit/:urlId',
     pathRegExp: /\/edit\/[\w-]+$/
   },
   {

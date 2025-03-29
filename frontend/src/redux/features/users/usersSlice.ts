@@ -33,7 +33,7 @@ interface ICreateParams {
 }
 
 interface IPatchParams {
-  id: string
+  id: number
   data: UserPatch
 
   params?: Params

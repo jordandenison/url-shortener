@@ -16,7 +16,10 @@ export const selectUrlData = (id: number, state: RootState) => state.urls.data.f
 export const selectUrlDataBySlug = (slug: string, state: RootState) => state.urls.data.find((url) => url.slug === slug)
 export const selectUrlsErrorMessage = (state: RootState) => state.urls.errorMessage
 export const selectUrlsLimit = (state: RootState) => state.urls.limit
+export const selectUrlsSearch = (state: RootState) => state.urls.search
 export const selectUrlsSkip = (state: RootState) => state.urls.skip
+export const selectUrlsSort = (state: RootState) => state.urls.sort
+export const selectUrlsSortOrder = (state: RootState) => state.urls.sortOrder
 export const selectUrlsTotal = (state: RootState) => state.urls.total
 export const selectUrlsLoading = (state: RootState) => state.urls.loading
 export const selectUrlsModifying = (state: RootState) => state.urls.creating || state.urls.patching || state.urls.removing

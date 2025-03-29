@@ -11,6 +11,7 @@ import { setCreatedAt } from '../../hooks/set-created-at'
 import { setUpdatedAt } from '../../hooks/set-updated-at'
 
 import { retryOnDuplicateSlugCollision } from './hooks/retry-on-duplicate-slug-collision'
+import { setCurrentSlug } from './hooks/set-current-slug'
 import { setSlug } from './hooks/set-slug'
 import { setVisits } from './hooks/set-visits'
 import { setUserId } from './hooks/set-user-id'
@@ -35,6 +36,9 @@ export const url = (app: Application) => {
       all: [schemaHooks.validateQuery(urlQueryValidator), schemaHooks.resolveQuery(urlQueryResolver)],
       create: [schemaHooks.validateData(urlDataValidator), throwErrorOnInvalidSlug, setSlug, setCreatedAt, setUpdatedAt, setVisits, setUserId],
       patch: [schemaHooks.validateData(urlPatchValidator), throwErrorOnInvalidSlug, setUpdatedAt]
+    },
+    after: {
+      create: [setCurrentSlug]
     },
     error: {
       create: [retryOnDuplicateSlugCollision]

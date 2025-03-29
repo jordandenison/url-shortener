@@ -44,11 +44,22 @@ export const urlPatchSchema = Type.Partial(
 export type UrlPatch = Static<typeof urlPatchSchema>
 export const urlPatchValidator = getValidator(urlPatchSchema, dataValidator)
 
-export const urlQueryProperties = Type.Pick(urlSchema, ['id', 'slug', 'userId'])
-export const urlQuerySchema = Type.Intersect([querySyntax(urlQueryProperties), Type.Object({}, { additionalProperties: false })], {
-  additionalProperties: false
-})
+export const urlQueryProperties = Type.Pick(urlSchema, ['id', 'slug', 'value', 'visits', 'userId'])
 export type UrlQuery = Static<typeof urlQuerySchema>
+export const urlQuerySchema = Type.Object(
+  {
+    ...querySyntax(urlQueryProperties).properties,
+    $or: Type.Optional(
+      Type.Array(
+        Type.Object({
+          value: Type.Optional(Type.Object({ $ilike: Type.String() })),
+          slug: Type.Optional(Type.Object({ $ilike: Type.String() }))
+        })
+      )
+    )
+  },
+  { additionalProperties: false }
+)
 export const urlQueryValidator = getValidator(urlQuerySchema, queryValidator)
 export const urlQueryResolver = resolve<UrlQuery, HookContext<UrlService>>({
   userId: async (value, user, context) => {

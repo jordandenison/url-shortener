@@ -1,5 +1,5 @@
 import { type Action, createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { Params } from '@feathersjs/feathers'
+import type { Paginated, Params } from '@feathersjs/feathers'
 
 import client from '../../../lib/feathers/feathersClient'
 
@@ -13,6 +13,8 @@ interface UrlDataState {
   data: Array<Url>
   limit: number
   skip: number
+  sort: string
+  sortOrder: number
   total: number
   creating: boolean
   loading: boolean
@@ -20,12 +22,15 @@ interface UrlDataState {
   removing: boolean
 
   errorMessage?: string
+  search?: string
 }
 
 const initialState: UrlDataState = {
   data: [],
   limit: 10,
   skip: 0,
+  sort: 'id',
+  sortOrder: 1,
   total: 0,
   creating: false,
   loading: false,
@@ -39,7 +44,7 @@ interface ICreateParams {
 }
 
 interface IRemoveParams {
-  id: string
+  id: number
   params?: Params
 }
 
@@ -47,15 +52,48 @@ interface IPatchParams extends IRemoveParams {
   data: UrlPatch
 }
 
-export const findAsync = createAsyncThunk('urls/find', async (params: Params | undefined, { dispatch }): Promise<Url[]> => {
-  try {
-    const { data } = await client.service('urls').find(params)
-    return data
-  } catch (e: unknown) {
-    dispatch(createToast({ type: 'error', message: `Error getting urls: ${(e as Error).message}` }))
-    throw e
+interface IFindParams {
+  search?: string
+  limit?: number
+  skip?: number
+  sort?: string
+  sortOrder?: number
+}
+
+export const findAsync = createAsyncThunk(
+  'urls/find',
+  async (
+    { search, limit, skip, sort, sortOrder }: IFindParams,
+    { dispatch }
+  ): Promise<Paginated<Url> & { search?: string; sort?: string; sortOrder?: number }> => {
+    try {
+      const query: Params['query'] = {}
+
+      if (limit) {
+        query.$limit = limit
+      }
+
+      if (skip) {
+        query.$skip = skip
+      }
+
+      if (search) {
+        query.$or = [{ value: { $ilike: `%${search}%` } }, { slug: { $ilike: `%${search}%` } }]
+      }
+
+      if (sort) {
+        query['$sort'] = { [sort]: sortOrder }
+      }
+
+      const result = await client.service('urls').find({ query })
+
+      return { ...result, search, sort, sortOrder }
+    } catch (e: unknown) {
+      dispatch(createToast({ type: 'error', message: `Error getting urls: ${(e as Error).message}` }))
+      throw e
+    }
   }
-})
+)
 
 export const createAsync = createAsyncThunk('urls/create', async ({ data, params }: ICreateParams, { dispatch }): Promise<Url> => {
   try {
@@ -91,7 +129,7 @@ const resetLoadingState = (state: UrlDataState) => {
   state.removing = false
 }
 
-export const handleFulfilled = (state: UrlDataState, action: PayloadAction<Url | Url[]>) => {
+const handleFulfilled = (state: UrlDataState, action: PayloadAction<Url | Url[]>) => {
   if (action.payload) {
     state.data = mergeData(state.data, action.payload)
   }
@@ -99,22 +137,47 @@ export const handleFulfilled = (state: UrlDataState, action: PayloadAction<Url |
   resetLoadingState(state)
 }
 
-export const handleRejected = (state: UrlDataState, action: Action<string> & { error: { message?: string } }) => {
+const handleFindFulfilled = (state: UrlDataState, action: PayloadAction<Paginated<Url> & { search?: string; sort?: string; sortOrder?: number }>) => {
+  state.data = action.payload.data
+  state.limit = action.payload.limit
+  state.skip = action.payload.skip
+  state.total = action.payload.total
+
+  if (action.payload.search) {
+    state.search = action.payload.search
+  } else {
+    delete state.search
+  }
+
+  if (action.payload.sort) {
+    state.sort = action.payload.sort
+  }
+
+  if (action.payload.sortOrder) {
+    state.sortOrder = action.payload.sortOrder
+  }
+
+  resetLoadingState(state)
+}
+
+const handleRejected = (state: UrlDataState, action: Action<string> & { error: { message?: string } }) => {
   state.errorMessage = action.error.message
 
   resetLoadingState(state)
 }
 
-export const handlePending = (loadingStateProperty: keyof Pick<UrlDataState, 'loading' | 'creating' | 'patching' | 'removing'>) => (state: UrlDataState) => {
+const handlePending = (loadingStateProperty: keyof Pick<UrlDataState, 'loading' | 'creating' | 'patching' | 'removing'>) => (state: UrlDataState) => {
   delete state.errorMessage
 
   state[loadingStateProperty] = true
 }
 
-export const handleRemoveFulfilled = (state: UrlDataState, action: PayloadAction<Url>) => {
+const handleRemoveFulfilled = (state: UrlDataState, action: PayloadAction<Url>) => {
   if (action.payload) {
     state.data = removeData(state.data, action.payload)
   }
+
+  state.total -= 1
 
   resetLoadingState(state)
 }
@@ -130,7 +193,7 @@ export const urlsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(findAsync.pending, handlePending('loading'))
-      .addCase(findAsync.fulfilled, handleFulfilled)
+      .addCase(findAsync.fulfilled, handleFindFulfilled)
       .addCase(findAsync.rejected, handleRejected)
       .addCase(createAsync.pending, handlePending('creating'))
       .addCase(createAsync.fulfilled, handleFulfilled)
@@ -139,7 +202,7 @@ export const urlsSlice = createSlice({
       .addCase(patchAsync.fulfilled, handleFulfilled)
       .addCase(patchAsync.rejected, handleRejected)
       .addCase(removeAsync.pending, handlePending('removing'))
-      .addCase(removeAsync.fulfilled, handleFulfilled)
+      .addCase(removeAsync.fulfilled, handleRemoveFulfilled)
       .addCase(removeAsync.rejected, handleRejected)
   }
 })
