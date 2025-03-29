@@ -11,7 +11,11 @@
   },
   "postgresql": {
     "client": "pg",
-    "connection": "postgres://deeporigin:deeporigin@postgres:5432/deeporigin"
+    "connection": "postgres://urlshortener:urlshortener@postgres:5432/urlshortener"
+  },
+  "postgresqlTest": {
+    "client": "pg",
+    "connection": "postgres://urlshortener:urlshortener@postgres-test:5432/urlshortener"
   },
   "authentication": {
     "entity": "user",

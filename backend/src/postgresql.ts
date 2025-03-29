@@ -10,7 +10,7 @@ declare module './declarations' {
 }
 
 export const postgresql = (app: Application) => {
-  const config = app.get('postgresql')
+  const config = process.env.NODE_ENV === 'test' ? app.get('postgresqlTest') : app.get('postgresql')
   const db = knex({
     ...config,
     ...knexSnakeCaseMappers()

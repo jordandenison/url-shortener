@@ -1,3 +1,3 @@
 #! /bin/bash
 
-docker exec -it -e PGPASSWORD=deeporigin deeporigin-postgres-1 psql -U deeporigin
+docker exec -it -e PGPASSWORD=urlshortener url-shortener-postgres-test-1 psql -U urlshortener

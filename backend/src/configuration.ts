@@ -8,6 +8,7 @@ export const configurationSchema = Type.Intersect([
   Type.Object({
     currentSlug: Type.String(),
     host: Type.String(),
+    postgresqlTest: Type.Object({}),
     port: Type.Number(),
     public: Type.String()
   })
