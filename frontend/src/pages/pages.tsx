@@ -3,6 +3,8 @@ export interface Page {
   name: string
   path: string
   pathRegExp: RegExp
+
+  secure?: boolean
 }
 
 const pages: Page[] = [
@@ -10,19 +12,22 @@ const pages: Page[] = [
     name: 'Dashboard',
     elementName: 'Dashboard',
     path: '/',
-    pathRegExp: /\/$/
+    pathRegExp: /\/$/,
+    secure: true
   },
   {
     name: 'Add Url',
     elementName: 'AddUrl',
     path: '/add',
-    pathRegExp: /\/add$/
+    pathRegExp: /\/add$/,
+    secure: true
   },
   {
     name: 'Edit Url',
     elementName: 'EditUrl',
     path: '/edit/:urlId',
-    pathRegExp: /\/edit\/[\w-]+$/
+    pathRegExp: /\/edit\/[\w-]+$/,
+    secure: true
   },
   {
     name: 'Handle Slug',

@@ -56,6 +56,7 @@ interface IFindParams {
   search?: string
   limit?: number
   skip?: number
+  slug?: string
   sort?: string
   sortOrder?: number
 }
@@ -63,7 +64,7 @@ interface IFindParams {
 export const findAsync = createAsyncThunk(
   'urls/find',
   async (
-    { search, limit, skip, sort, sortOrder }: IFindParams,
+    { search, limit, skip, slug, sort, sortOrder }: IFindParams,
     { dispatch }
   ): Promise<Paginated<Url> & { search?: string; sort?: string; sortOrder?: number }> => {
     try {
@@ -79,6 +80,10 @@ export const findAsync = createAsyncThunk(
 
       if (search) {
         query.$or = [{ value: { $ilike: `%${search}%` } }, { slug: { $ilike: `%${search}%` } }]
+      }
+
+      if (slug) {
+        query.slug = slug
       }
 
       if (sort) {
@@ -168,6 +173,10 @@ const handleRejected = (state: UrlDataState, action: Action<string> & { error: {
 
 const handlePending = (loadingStateProperty: keyof Pick<UrlDataState, 'loading' | 'creating' | 'patching' | 'removing'>) => (state: UrlDataState) => {
   delete state.errorMessage
+
+  if (loadingStateProperty === 'loading') {
+    state.data = []
+  }
 
   state[loadingStateProperty] = true
 }

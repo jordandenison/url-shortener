@@ -36,7 +36,7 @@ export type UrlData = Static<typeof urlDataSchema>
 export const urlDataValidator = getValidator(urlDataSchema, dataValidator)
 
 export const urlPatchSchema = Type.Partial(
-  Type.Pick(urlSchema, ['value', 'slug'], {
+  Type.Pick(urlSchema, ['slug', 'value', 'visits'], {
     $id: 'UrlPatch',
     additionalProperties: false
   })

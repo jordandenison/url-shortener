@@ -10,6 +10,7 @@ import type { Application } from '../../declarations'
 import { setCreatedAt } from '../../hooks/set-created-at'
 import { setUpdatedAt } from '../../hooks/set-updated-at'
 
+import { handleAnonFind } from './hooks/handle-anon-find'
 import { retryOnDuplicateSlugCollision } from './hooks/retry-on-duplicate-slug-collision'
 import { setCurrentSlug } from './hooks/set-current-slug'
 import { setSlug } from './hooks/set-slug'
@@ -30,7 +31,11 @@ export const url = (app: Application) => {
   })
   app.service(urlPath).hooks({
     around: {
-      all: [authenticate('jwt')]
+      find: [handleAnonFind],
+      get: [authenticate('jwt')],
+      create: [authenticate('jwt')],
+      patch: [authenticate('jwt')],
+      remove: [authenticate('jwt')]
     },
     before: {
       all: [schemaHooks.validateQuery(urlQueryValidator), schemaHooks.resolveQuery(urlQueryResolver)],
