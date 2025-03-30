@@ -57,6 +57,12 @@ docker exec -it url-shortener-frontend-1 npm test
 docker exec -it url-shortener-backend-1 npm test
 ```
 
+### Backend Tests with Code Coverage
+
+```bash
+docker exec -it url-shortener-backend-1 npm run coverage
+```
+
 ---
 
 ## 🛠️ Tech Stack
